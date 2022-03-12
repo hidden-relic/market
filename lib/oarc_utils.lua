@@ -1406,6 +1406,18 @@ function RemoveInCircle(surface, area, type, pos, dist)
     end
 end
 
+function killradius(r, percent)
+    local r = r or 10
+    local percent = percent or 10
+    local bugs = game.player.surface.find_entities_filtered{force = "enemy", position = game.player.position, radius = r}
+    local max = #bugs
+    while (#bugs / max) * 100 > 100 - (100 / percent) do
+        for _, bug in pairs (bugs) do
+            if math.random(0,100) > 50 then bug.die() end
+        end
+    end
+end
+
 -- For easy local testing of map gen settings. Just set what you want and uncomment usage in CreateGameSurface!
 function SurfaceSettingsHelper(settings)
 
@@ -1486,7 +1498,8 @@ function CreateGameSurface()
 
         -- Create new game surface
         local s = game.create_surface(GAME_SURFACE_NAME, nauvis_settings)
-
+        s.ticks_per_day = TICKS_PER_MINUTE * 30
+        s.daytime = 0
     end
 
     -- Add surface and safe areas

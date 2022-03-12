@@ -292,6 +292,9 @@ function SendPlayerToNewSpawnAndCreateIt(delayedSpawn)
                 {x=delayedSpawn.pos.x+x_dist, y=delayedSpawn.pos.y-2}, -- Ctrl
                 {x=delayedSpawn.pos.x+x_dist, y=delayedSpawn.pos.y}) -- Status
 
+                if (global.ocore.markets[player.name] == nil) then
+                    global.ocore.markets[player.name] = {}
+                end
         market.create(player, {x=delayedSpawn.pos.x+x_dist-3, y=delayedSpawn.pos.y-1}) -- market
 
 
