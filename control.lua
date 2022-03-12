@@ -1,5 +1,4 @@
 -- local spy = require('addons/spy')
-
 local console = {
     name = 'Console',
     admin = true,
@@ -773,5 +772,43 @@ end, {
 script.on_event(defines.events.on_resource_depleted, function(event)
     if global.ocfg.enable_miner_decon then
         OarcAutoDeconOnResourceDepleted(event)
+    end
+end)
+
+--------------------------------------------
+script.on_event(defines.events.on_market_item_purchased, function(event)
+    local player = game.players[event.player_index]
+    local player_market = global.ocore.markets[player.name]
+    local count = event.count
+
+    local offers = player_market.market.get_market_items()
+    local offer = offers[event.offer_index]
+    if event.offer_index <= 19 then
+        local price = 0
+        for _, single_price in pairs(offer.price) do
+            price = price + single_price[2]
+        end
+        if count > 1 then
+            local refund = 0
+            refund = price * (count - 1)
+            player.insert {name = "coin", count = refund}
+        end
+
+        for i, item in ipairs(offers) do
+            if i == event.offer_index then
+                item.price = math.ceil(market.formatPrice(price) * 1.025)
+            end
+        end
+
+        player_market.market.clear_market_items()
+        for __, item in pairs(offers) do
+            player_market.market.add_market_item(item)
+        end
+    elseif event.offer_index == 20 then
+        player_market.sell_speed_lvl = player_market.sell_speed_lvl + 1
+        player_market.sell_speed_offer.price = market.formatPrice(
+                                                   market.speed_upgrade_prices[10 -
+                                                       player_market.sell_speed_lvl])
+        player_market.sell_speed_multiplier = 10 - player_market.sell_speed_lvl
     end
 end)
